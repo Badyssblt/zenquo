@@ -5,9 +5,20 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
   css: ['./app/assets/css/main.css'],
+
   vite: {
     plugins: [
       tailwindcss()
     ]
+  },
+
+  modules: ['@sidebase/nuxt-auth'],
+  auth: {
+    provider: {
+      type: 'authjs',
+      trustHost: false,
+      defaultProvider: 'credentials',
+      addDefaultCallbackUrl: true
+    }
   }
 })

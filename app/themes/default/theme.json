@@ -1,0 +1,30 @@
+{
+  "name": "default",
+  "displayName": "Zenquo Default Theme",
+  "version": "1.0.0",
+  "author": "Zenquo Team",
+  "description": "Thème par défaut de Zenquo avec sections et composants modulaires",
+  "sections": [
+    "Hero",
+    "FeaturedProducts",
+    "Newsletter"
+  ],
+  "components": [
+    "Button",
+    "Card",
+    "Input"
+  ],
+  "settings": {
+    "colors": {
+      "primary": "#3b82f6",
+      "secondary": "#8b5cf6",
+      "accent": "#f59e0b",
+      "background": "#ffffff",
+      "text": "#1f2937"
+    },
+    "typography": {
+      "fontFamily": "Inter, system-ui, sans-serif",
+      "headingFontFamily": "Inter, system-ui, sans-serif"
+    }
+  }
+}

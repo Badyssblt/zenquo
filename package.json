@@ -7,13 +7,22 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:seed": "tsx prisma/seed.ts",
+    "prisma:studio": "prisma studio"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
     "@prisma/adapter-mariadb": "^7.0.1",
     "@prisma/client": "^7.0.1",
+    "@sidebase/nuxt-auth": "^1.1.1",
     "@tailwindcss/vite": "^4.1.17",
     "dotenv": "^17.2.3",
+    "next-auth": "~4.21.1",
     "nuxt": "^4.2.1",
     "tailwindcss": "^4.1.17",
     "vue": "^3.5.25",
@@ -21,6 +30,7 @@
   },
   "devDependencies": {
     "@types/node": "^24.10.1",
-    "prisma": "^7.0.1"
+    "prisma": "^7.0.1",
+    "tsx": "^4.21.0"
   }
 }

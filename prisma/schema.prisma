@@ -6,7 +6,7 @@
 
 generator client {
   provider = "prisma-client"
-  output   = "../generated/prisma"
+  output   = "./generated/prisma"
 }
 
 datasource db {
@@ -106,4 +106,16 @@ model Theme {
   config        Json      // Configuration du thème
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
+}
+
+model Setting {
+  id            String    @id @default(cuid())
+  key           String    @unique
+  value         Json      // Peut stocker n'importe quel type (string, number, object, array)
+  type          String    @default("string") // Type de la valeur (string, number, boolean, json, array)
+  description   String?   // Description de ce que fait ce setting
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([key])
 }

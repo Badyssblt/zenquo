@@ -1,5 +1,5 @@
 // kernel-core.ts
-// Système de hooks et plugins inspiré de WordPress
+// Systï¿½me de hooks et plugins inspirï¿½ de WordPress
 
 /**
  * Erreur custom pour les blocs/sections
@@ -33,7 +33,7 @@ interface Filter {
 
 /**
  * Kernel principal de Zenquo
- * Gère les hooks, filtres, plugins et configuration globale
+ * Gï¿½re les hooks, filtres, plugins et configuration globale
  */
 export class Kernel {
   private actions: Map<string, Hook> = new Map()
@@ -44,7 +44,7 @@ export class Kernel {
   // ==================== ACTIONS ====================
 
   /**
-   * Enregistrer une action (point d'exécution)
+   * Enregistrer une action (point d'exï¿½cution)
    * @example kernel.addAction('beforeRenderSection', (section) => console.log(section))
    */
   addAction(hookName: string, callback: (...args: any[]) => any, priority: number = 10) {
@@ -54,16 +54,16 @@ export class Kernel {
 
     const hook = this.actions.get(hookName)!
 
-    // Ajouter la priorité au callback
+    // Ajouter la prioritï¿½ au callback
     const callbackWithPriority = Object.assign(callback, { priority })
     hook.callbacks.push(callbackWithPriority)
 
-    // Trier par priorité (plus petit = exécuté en premier)
+    // Trier par prioritï¿½ (plus petit = exï¿½cutï¿½ en premier)
     hook.callbacks.sort((a: any, b: any) => (a.priority || 10) - (b.priority || 10))
   }
 
   /**
-   * Déclencher une action
+   * Dï¿½clencher une action
    * @example kernel.doAction('beforeRenderSection', section)
    */
   async doAction(hookName: string, ...args: any[]) {
@@ -92,11 +92,11 @@ export class Kernel {
 
     const filter = this.filters.get(filterName)!
 
-    // Ajouter la priorité au callback
+    // Ajouter la prioritï¿½ au callback
     const callbackWithPriority = Object.assign(callback, { priority })
     filter.callbacks.push(callbackWithPriority)
 
-    // Trier par priorité
+    // Trier par prioritï¿½
     filter.callbacks.sort((a: any, b: any) => (a.priority || 10) - (b.priority || 10))
   }
 
@@ -132,7 +132,7 @@ export class Kernel {
 
     this.plugins.set(name, plugin)
 
-    // Initialiser le plugin s'il a une méthode init
+    // Initialiser le plugin s'il a une mï¿½thode init
     if (plugin.init && typeof plugin.init === 'function') {
       try {
         plugin.init(this)
@@ -144,7 +144,7 @@ export class Kernel {
   }
 
   /**
-   * Récupérer un plugin
+   * Rï¿½cupï¿½rer un plugin
    */
   getPlugin(name: string) {
     return this.plugins.get(name)
@@ -162,7 +162,7 @@ export class Kernel {
   }
 
   /**
-   * Désactiver un plugin
+   * Dï¿½sactiver un plugin
    */
   disablePlugin(name: string) {
     const plugin = this.plugins.get(name)
@@ -187,21 +187,21 @@ export class Kernel {
   // ==================== CONFIG ====================
 
   /**
-   * Définir une config
+   * Dï¿½finir une config
    */
   setConfig(key: string, value: any) {
     this.config[key] = value
   }
 
   /**
-   * Récupérer une config
+   * Rï¿½cupï¿½rer une config
    */
   getConfig(key: string, defaultValue?: any) {
     return this.config[key] ?? defaultValue
   }
 
   /**
-   * Récupérer toute la config
+   * Rï¿½cupï¿½rer toute la config
    */
   getAllConfig() {
     return { ...this.config }
