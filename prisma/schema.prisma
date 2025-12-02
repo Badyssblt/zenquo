@@ -1,0 +1,109 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String?
+  password      String?
+  role          Role      @default(CUSTOMER)
+  orders        Order[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+enum Role {
+  ADMIN
+  CUSTOMER
+}
+
+model Page {
+  id            String    @id @default(cuid())
+  slug          String    @unique
+  title         String
+  sections      Json      // Array de sections avec settings
+  published     Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Product {
+  id            String    @id @default(cuid())
+  name          String
+  slug          String    @unique
+  description   String?   @db.Text
+  price         Float
+  comparePrice  Float?
+  images        Json      // Array d'URLs
+  stock         Int       @default(0)
+  collectionId  String?
+  collection    Collection? @relation(fields: [collectionId], references: [id])
+  orderItems    OrderItem[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Collection {
+  id            String    @id @default(cuid())
+  name          String
+  slug          String    @unique
+  description   String?
+  products      Product[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Order {
+  id            String      @id @default(cuid())
+  userId        String
+  user          User        @relation(fields: [userId], references: [id])
+  status        OrderStatus @default(PENDING)
+  total         Float
+  items         OrderItem[]
+  shippingAddress Json
+  paymentMethod String      // 'stripe' ou 'paypal'
+  paymentId     String?     // ID transaction Stripe/PayPal
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+model OrderItem {
+  id            String    @id @default(cuid())
+  orderId       String
+  order         Order     @relation(fields: [orderId], references: [id])
+  productId     String
+  product       Product   @relation(fields: [productId], references: [id])
+  quantity      Int
+  price         Float     // Prix au moment de l'achat
+}
+
+model Theme {
+  id            String    @id @default(cuid())
+  name          String    @unique
+  active        Boolean   @default(false)
+  config        Json      // Configuration du thème
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
