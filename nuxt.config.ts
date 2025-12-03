@@ -12,13 +12,8 @@ export default defineNuxtConfig({
     ]
   },
 
-  modules: ['@sidebase/nuxt-auth'],
-  auth: {
-    provider: {
-      type: 'authjs',
-      trustHost: false,
-      defaultProvider: 'credentials',
-      addDefaultCallbackUrl: true
-    }
+  modules: [],
+  runtimeConfig: {
+    authSecret: process.env.AUTH_SECRET || 'dev-secret-key-change-in-production'
   }
 })

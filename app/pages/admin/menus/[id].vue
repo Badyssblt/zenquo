@@ -34,7 +34,7 @@
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div v-if="menuItems.length === 0" class="text-center py-12 text-muted-foreground">
+          <div v-if="topLevelItems.length === 0" class="text-center py-12 text-muted-foreground">
             <MenuIcon class="mx-auto h-12 w-12 mb-4 opacity-50" />
             <p>Aucun élément dans ce menu</p>
             <Button variant="link" @click="showAddDialog = true">
@@ -44,7 +44,7 @@
 
           <Draggable
             v-else
-            v-model="menuItems"
+            v-model="topLevelItems"
             :animation="200"
             handle=".drag-handle"
             @end="handleReorder"
@@ -104,6 +104,7 @@
                     :animation="200"
                     handle=".drag-handle"
                     group="subitems"
+                    @end="handleReorderChildren(item)"
                     class="space-y-2"
                   >
                     <template #item="{ element: child }">
@@ -140,7 +141,7 @@
         </CardHeader>
         <CardContent>
           <nav class="space-y-1">
-            <template v-for="item in menuItems" :key="item.id">
+            <template v-for="item in topLevelItems" :key="item.id">
               <a
                 href="#"
                 class="flex items-center gap-2 px-3 py-2 rounded hover:bg-accent text-sm transition-colors"
@@ -369,6 +370,18 @@ const showAddDialog = ref(false)
 const showSettingsDialog = ref(false)
 const editingItem = ref<MenuItem | null>(null)
 
+// Filtrer uniquement les items de premier niveau pour le drag & drop principal
+const topLevelItems = computed({
+  get: () => menuItems.value.filter(item => !item.parentId),
+  set: (value) => {
+    // Mettre à jour les items de premier niveau
+    menuItems.value = [
+      ...value,
+      ...menuItems.value.filter(item => item.parentId)
+    ]
+  }
+})
+
 const itemForm = ref({
   label: '',
   url: '',
@@ -461,9 +474,48 @@ const deleteItem = async (item: MenuItem) => {
   }
 }
 
-const handleReorder = () => {
-  // TODO: Implémenter l'API de réordonnancement
-  console.log('Items réordonnés:', menuItems.value)
+const handleReorder = async () => {
+  try {
+    // Préparer les données pour l'API (uniquement les items de premier niveau)
+    const itemsToReorder = topLevelItems.value.map((item, index) => ({
+      id: item.id,
+      order: index,
+      parentId: item.parentId || null
+    }))
+
+    // Envoyer au backend
+    await MenuApiService.reorderItems(menu.value!.id, itemsToReorder)
+
+    console.log('Items réordonnés avec succès')
+  } catch (error: any) {
+    console.error('Erreur lors du réordonnancement:', error)
+    alert(error.message || 'Erreur lors du réordonnancement')
+    // Recharger les items en cas d'erreur
+    await loadMenu()
+  }
+}
+
+const handleReorderChildren = async (parentItem: MenuItem) => {
+  try {
+    if (!parentItem.children) return
+
+    // Préparer les données pour l'API (seulement les enfants de cet item)
+    const childrenToReorder = parentItem.children.map((child, index) => ({
+      id: child.id,
+      order: index,
+      parentId: parentItem.id
+    }))
+
+    // Envoyer au backend
+    await MenuApiService.reorderItems(menu.value!.id, childrenToReorder)
+
+    console.log('Sous-éléments réordonnés avec succès')
+  } catch (error: any) {
+    console.error('Erreur lors du réordonnancement des sous-éléments:', error)
+    alert(error.message || 'Erreur lors du réordonnancement')
+    // Recharger les items en cas d'erreur
+    await loadMenu()
+  }
 }
 
 const handleUpdateMenu = async () => {

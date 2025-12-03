@@ -27,3 +27,14 @@ export const OrderStatus = {
 } as const
 
 export type OrderStatus = (typeof OrderStatus)[keyof typeof OrderStatus]
+
+
+export const MenuItemType = {
+  LINK: 'LINK',
+  PAGE: 'PAGE',
+  CATEGORY: 'CATEGORY',
+  CUSTOM: 'CUSTOM',
+  DIVIDER: 'DIVIDER'
+} as const
+
+export type MenuItemType = (typeof MenuItemType)[keyof typeof MenuItemType]

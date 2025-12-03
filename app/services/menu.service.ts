@@ -202,4 +202,25 @@ export class MenuApiService {
       throw error
     }
   }
+
+  /**
+   * Réordonner les items d'un menu
+   */
+  static async reorderItems(menuId: string, items: Array<{ id: string; order: number; parentId?: string | null }>): Promise<MenuResponse> {
+    try {
+      const response = await $fetch<MenuResponse>(`/api/menus/${menuId}/reorder`, {
+        method: 'POST',
+        body: { items }
+      })
+
+      if (!response.success) {
+        throw new Error(response.message || 'Erreur lors du réordonnancement des items')
+      }
+
+      return response
+    } catch (error: any) {
+      console.error('Erreur lors du réordonnancement des items:', error)
+      throw error
+    }
+  }
 }

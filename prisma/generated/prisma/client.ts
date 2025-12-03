@@ -79,3 +79,13 @@ export type Theme = Prisma.ThemeModel
  * 
  */
 export type Setting = Prisma.SettingModel
+/**
+ * Model Menu
+ * 
+ */
+export type Menu = Prisma.MenuModel
+/**
+ * Model MenuItem
+ * 
+ */
+export type MenuItem = Prisma.MenuItemModel

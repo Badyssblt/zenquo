@@ -289,6 +289,23 @@ export type EnumOrderStatusWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedEnumOrderStatusFilter<$PrismaModel>
 }
 
+export type EnumMenuItemTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.MenuItemType | Prisma.EnumMenuItemTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.MenuItemType[]
+  notIn?: $Enums.MenuItemType[]
+  not?: Prisma.NestedEnumMenuItemTypeFilter<$PrismaModel> | $Enums.MenuItemType
+}
+
+export type EnumMenuItemTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.MenuItemType | Prisma.EnumMenuItemTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.MenuItemType[]
+  notIn?: $Enums.MenuItemType[]
+  not?: Prisma.NestedEnumMenuItemTypeWithAggregatesFilter<$PrismaModel> | $Enums.MenuItemType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumMenuItemTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumMenuItemTypeFilter<$PrismaModel>
+}
+
 export type NestedStringFilter<$PrismaModel = never> = {
   equals?: string | Prisma.StringFieldRefInput<$PrismaModel>
   in?: string[]
@@ -541,6 +558,23 @@ export type NestedEnumOrderStatusWithAggregatesFilter<$PrismaModel = never> = {
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumOrderStatusFilter<$PrismaModel>
   _max?: Prisma.NestedEnumOrderStatusFilter<$PrismaModel>
+}
+
+export type NestedEnumMenuItemTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.MenuItemType | Prisma.EnumMenuItemTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.MenuItemType[]
+  notIn?: $Enums.MenuItemType[]
+  not?: Prisma.NestedEnumMenuItemTypeFilter<$PrismaModel> | $Enums.MenuItemType
+}
+
+export type NestedEnumMenuItemTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.MenuItemType | Prisma.EnumMenuItemTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.MenuItemType[]
+  notIn?: $Enums.MenuItemType[]
+  not?: Prisma.NestedEnumMenuItemTypeWithAggregatesFilter<$PrismaModel> | $Enums.MenuItemType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumMenuItemTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumMenuItemTypeFilter<$PrismaModel>
 }
 
 
