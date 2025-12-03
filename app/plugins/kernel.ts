@@ -1,4 +1,5 @@
 import { defineNuxtPlugin } from '#app'
+import { useMenu } from '~/composables/useMenu'
 import { Kernel } from '~~/kernel-core'
 
 /**
@@ -10,23 +11,28 @@ export default defineNuxtPlugin(async (nuxtApp) => {
   const kernel = new Kernel()
 
   // ==================== CONFIGURATION INITIALE ====================
-
+  
   // Charger tous les settings depuis la DB (uniquement côté serveur)
   if (import.meta.server) {
     try {
-      const { prisma } = await import('~~/lib/prisma')
+      const { SettingService } = await import('~~/server/services/setting.service')
+      const { ThemeService } = await import('~~/server/services/theme.service')
 
-      // Charger tous les settings
-      const settings = await prisma.setting.findMany()
-      settings.forEach((setting) => {
-        kernel.setConfig(`settings.${setting.key}`, setting.value)
+      const { loadMenu } = useMenu()
+      // Charger tous les settings via le service
+      const settingsMap = await SettingService.getAllAsMap()
+      settingsMap.forEach((value, key) => {
+        kernel.setConfig(`settings.${key}`, value)
       })
 
-      // Charger le thème actif
-      const activeTheme = await prisma.theme.findFirst({
-        where: { active: true }
-      })
+      // Charger le thème actif via le service
+      const activeTheme = await ThemeService.getActive()
 
+      const mainMenu = await loadMenu('menu-principal')
+
+      kernel.setConfig('menu', mainMenu)
+
+      
       if (activeTheme) {
         kernel.setConfig('theme', activeTheme.name)
         kernel.setConfig('themeConfig', activeTheme.config)
@@ -36,24 +42,29 @@ export default defineNuxtPlugin(async (nuxtApp) => {
         console.warn('⚠️  Aucun thème actif en DB, utilisation du thème default')
       }
 
-      console.log(`✅ ${settings.length} settings chargés depuis la DB`)
+      console.log(`✅ ${settingsMap.size} settings chargés depuis la DB`)
+
+      // IMPORTANT: Passer la config au client via le payload Nuxt
+      nuxtApp.payload.kernelConfig = kernel.getAllConfig()
     } catch (error) {
       console.error('❌ Erreur lors du chargement des settings:', error)
       // Fallback values
       kernel.setConfig('theme', 'default')
       kernel.setConfig('settings.siteName', 'Zenquo')
+      nuxtApp.payload.kernelConfig = kernel.getAllConfig()
     }
   } else {
-    // Côté client, les settings sont déjà dans le payload SSR
+    // Côté client, récupérer la config depuis le payload SSR
+    const kernelConfig = nuxtApp.payload.kernelConfig || {}
+
+    // Restaurer toute la config dans le kernel client
+    Object.entries(kernelConfig).forEach(([key, value]) => {
+      kernel.setConfig(key, value)
+    })
+
+    console.log('✅ Config kernel restaurée depuis le payload SSR')
   }
 
-  // Valeurs par défaut si pas en DB
-  if (!kernel.getConfig('settings.siteName')) {
-    kernel.setConfig('settings.siteName', 'Zenquo')
-  }
-  if (!kernel.getConfig('settings.siteUrl')) {
-    kernel.setConfig('settings.siteUrl', process.env.NUXT_PUBLIC_SITE_URL || 'http://localhost:3000')
-  }
 
   // ==================== ENREGISTREMENT DES PLUGINS ====================
 

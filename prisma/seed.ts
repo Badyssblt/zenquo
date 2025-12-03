@@ -1,6 +1,9 @@
 import { readdir, readFile } from 'fs/promises'
-import { prisma } from '../lib/prisma'
 import { join } from 'path'
+import { ThemeService } from '../server/services/theme.service'
+import { UserService } from '../server/services/user.service'
+import { PageService } from '../server/services/page.service'
+import { SettingService } from '../server/services/setting.service'
 
 
 /**
@@ -56,49 +59,26 @@ async function main() {
   }
 
   for (const theme of themes) {
-    const existingTheme = await prisma.theme.findUnique({
-      where: { name: theme.name }
-    })
-
-    if (existingTheme) {
-      // Mettre à jour le thème existant
-      await prisma.theme.update({
-        where: { name: theme.name },
-        data: {
-          config: theme.config
-        }
-      })
-      console.log(`  ↻ Thème mis à jour: ${theme.name}`)
-    } else {
-      // Créer le nouveau thème
-      await prisma.theme.create({
-        data: {
-          name: theme.name,
-          active: theme.name === 'default', // Le thème default est actif par défaut
-          config: theme.config
-        }
-      })
-      console.log(`  ✓ Thème créé: ${theme.name}`)
-    }
+    await ThemeService.upsert(
+      theme.name,
+      theme.config,
+      theme.name === 'default' // Le thème default est actif par défaut
+    )
+    console.log(`  ✓ Thème créé/mis à jour: ${theme.name}`)
   }
 
   // ==================== USER ADMIN ====================
   console.log('\n👤 Création de l\'utilisateur admin...')
 
   const adminEmail = 'admin@zenquo.local'
-  const existingAdmin = await prisma.user.findUnique({
-    where: { email: adminEmail }
-  })
+  const emailExists = await UserService.emailExists(adminEmail)
 
-  if (!existingAdmin) {
-    // Note: En prod, il faudra hasher le mot de passe avec bcrypt
-    await prisma.user.create({
-      data: {
-        email: adminEmail,
-        name: 'Admin Zenquo',
-        password: 'admin123', // À hasher en production !
-        role: 'ADMIN'
-      }
+  if (!emailExists) {
+    await UserService.create({
+      email: adminEmail,
+      name: 'Admin Zenquo',
+      password: 'admin123', // Sera automatiquement hashé par le service
+      role: 'ADMIN'
     })
     console.log(`  ✓ Admin créé: ${adminEmail} / admin123`)
   } else {
@@ -109,33 +89,29 @@ async function main() {
   console.log('\n📄 Création de la page d\'accueil...')
 
   const homeSlug = 'home'
-  const existingHome = await prisma.page.findUnique({
-    where: { slug: homeSlug }
-  })
+  const slugExists = await PageService.slugExists(homeSlug)
 
-  if (!existingHome) {
-    await prisma.page.create({
-      data: {
-        slug: homeSlug,
-        title: 'Accueil',
-        published: true,
-        sections: [
-          {
-            id: 'hero-1',
-            type: 'Hero',
-            settings: {
-              title: 'Bienvenue sur Zenquo',
-              subtitle: 'Le CMS e-commerce modulaire et extensible',
-              backgroundImage: '',
-              ctaButton: {
-                text: 'Découvrir',
-                link: '/products',
-                variant: 'primary'
-              }
+  if (!slugExists) {
+    await PageService.create({
+      slug: homeSlug,
+      title: 'Accueil',
+      published: true,
+      sections: [
+        {
+          id: 'hero-1',
+          type: 'Hero',
+          settings: {
+            title: 'Bienvenue sur Zenquo',
+            subtitle: 'Le CMS e-commerce modulaire et extensible',
+            backgroundImage: '',
+            ctaButton: {
+              text: 'Découvrir',
+              link: '/products',
+              variant: 'primary'
             }
           }
-        ]
-      }
+        }
+      ]
     })
     console.log(`  ✓ Page créée: ${homeSlug}`)
   } else {
@@ -153,20 +129,8 @@ async function main() {
     { key: 'itemsPerPage', value: 12, type: 'number', description: 'Nombre d\'articles par page' }
   ]
 
-  for (const setting of defaultSettings) {
-    const exists = await prisma.setting.findUnique({
-      where: { key: setting.key }
-    })
-
-    if (!exists) {
-      await prisma.setting.create({
-        data: setting
-      })
-      console.log(`  ✓ Setting créé: ${setting.key}`)
-    } else {
-      console.log(`  ↻ Setting existe déjà: ${setting.key}`)
-    }
-  }
+  await SettingService.createMany(defaultSettings)
+  console.log(`  ✓ ${defaultSettings.length} settings créés/mis à jour`)
 
   console.log('\n✅ Seed terminé !')
 }
@@ -175,7 +139,4 @@ main()
   .catch((e) => {
     console.error('❌ Erreur lors du seed:', e)
     process.exit(1)
-  })
-  .finally(async () => {
-    await prisma.$disconnect()
   })

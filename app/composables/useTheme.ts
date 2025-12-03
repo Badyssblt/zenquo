@@ -1,8 +1,10 @@
+import { ThemeApiService } from '~/services/theme.service'
+
 export const useTheme = () => {
   const { $kernel } = useNuxtApp()
 
   // Thème actif (stocké dans le kernel)
-  const activeTheme = computed(() => $kernel.getConfig('theme', 'default'))
+  const activeTheme = computed(() => $kernel.getConfig('theme'))
 
   /**
    * Charger un composant section depuis le thème actif
@@ -40,48 +42,47 @@ export const useTheme = () => {
    * Charger la configuration du thème
    */
   const loadThemeConfig = async (themeName: string) => {
-    try {
-      const config = await import(`~/themes/${themeName}/theme.json`)
-      return config.default || config
-    } catch (error) {
-      console.error(`Theme config not found for ${themeName}`)
-      return null
-    }
+    return await ThemeApiService.loadConfig(themeName)
   }
 
   /**
-   * Changer de thème
+   * Changer de thème (appelle l'API pour persister en DB)
+   * IMPORTANT: Cette fonction modifie la DB et nécessite un rechargement
+   * de page pour que le plugin kernel recharge le nouveau thème depuis la DB
    */
   const setTheme = async (themeName: string) => {
-    const config = await loadThemeConfig(themeName)
+    try {
+      // 1. Appeler l'API via le service pour activer le thème en DB
+      const response = await ThemeApiService.activate(themeName)
 
-    if (!config) {
-      throw new Error(`Theme ${themeName} not found`)
+      // 2. Hook pour permettre aux plugins de réagir au changement
+      await $kernel.doAction('themeChanged', themeName)
+
+      // 3. Recharger la page pour appliquer le nouveau thème
+      // Le plugin kernel rechargera automatiquement le thème depuis la DB
+      if (import.meta.client) {
+        window.location.reload()
+      }
+
+      return response
+    } catch (error: any) {
+      console.error('Erreur lors du changement de thème:', error)
+      throw error
     }
-
-    // Charger les dépendances du thème si nécessaire
-    if (config.dependencies) {
-      console.log(`Theme ${themeName} requires:`, config.dependencies)
-      // Note: Les dépendances doivent être installées via npm
-    }
-
-    // Mettre à jour le kernel
-    $kernel.setConfig('theme', themeName)
-    $kernel.setConfig('themeConfig', config)
-
-    // Hook pour permettre aux plugins de réagir au changement de thème
-    await $kernel.doAction('themeChanged', themeName, config)
   }
 
   /**
-   * Lister tous les thèmes disponibles
+   * Lister tous les thèmes disponibles (depuis l'API)
    */
-  const getAvailableThemes = () => {
-    // En production, cela devrait venir d'une API ou du filesystem
-    return [
-      { name: 'default', displayName: 'Default Theme' },
-      { name: 'shadcn', displayName: 'Shadcn Theme' }
-    ]
+  const getAvailableThemes = async () => {
+    return await ThemeApiService.getAll()
+  }
+
+  /**
+   * Récupérer le thème actif depuis l'API
+   */
+  const fetchActiveTheme = async () => {
+    return await ThemeApiService.getActive()
   }
 
   return {
@@ -90,6 +91,7 @@ export const useTheme = () => {
     loadComponent,
     loadThemeConfig,
     setTheme,
-    getAvailableThemes
+    getAvailableThemes,
+    fetchActiveTheme
   }
 }

@@ -43,6 +43,7 @@ onMounted(async () => {
   <div class="theme-renderer">
     <!-- Rendre chaque section dynamiquement -->
     <component
+    
       v-for="(section, index) in sections"
       :key="section.id || `section-${index}`"
       :is="sectionComponents[section.type]"

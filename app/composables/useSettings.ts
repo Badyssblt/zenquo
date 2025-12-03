@@ -1,3 +1,5 @@
+import { SettingApiService } from '~/services/setting.service'
+
 /**
  * Composable pour gérer les settings de l'application
  * Les settings sont chargés depuis la DB au démarrage et mis en cache dans le kernel
@@ -22,21 +24,25 @@ export const useSettings = () => {
   /**
    * Sauvegarder un setting en DB via API
    */
-  const saveSetting = async (key: string, value: any) => {
+  const saveSetting = async (key: string, value: any, type: string = 'string', description?: string) => {
     try {
-      await $fetch('/api/settings', {
-        method: 'PUT',
-        body: { key, value }
-      })
+      const response = await SettingApiService.upsert(key, value, type, description)
 
       // Mettre à jour le cache local
       setSetting(key, value)
 
-      return true
+      return response
     } catch (error) {
       console.error(`Erreur lors de la sauvegarde du setting ${key}:`, error)
-      return false
+      throw error
     }
+  }
+
+  /**
+   * Récupérer un setting depuis l'API
+   */
+  const fetchSetting = async (key: string) => {
+    return await SettingApiService.getByKey(key)
   }
 
   /**
@@ -44,24 +50,33 @@ export const useSettings = () => {
    */
   const loadSettings = async () => {
     try {
-      const settings = await $fetch<Record<string, any>>('/api/settings')
+      const settingsArray = await SettingApiService.getAll()
 
       // Stocker tous les settings dans le kernel
-      Object.entries(settings).forEach(([key, value]) => {
-        setSetting(key, value)
+      settingsArray.forEach((setting) => {
+        setSetting(setting.key, setting.value)
       })
 
-      return settings
+      return settingsArray
     } catch (error) {
       console.error('Erreur lors du chargement des settings:', error)
-      return {}
+      return []
     }
+  }
+
+  /**
+   * Récupérer tous les settings sous forme d'objet
+   */
+  const getAllSettingsAsObject = async () => {
+    return await SettingApiService.getAllAsObject()
   }
 
   return {
     getSetting,
     setSetting,
     saveSetting,
-    loadSettings
+    fetchSetting,
+    loadSettings,
+    getAllSettingsAsObject
   }
 }

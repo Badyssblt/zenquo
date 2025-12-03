@@ -119,3 +119,50 @@ model Setting {
 
   @@index([key])
 }
+
+model Menu {
+  id            String      @id @default(cuid())
+  name          String      // Nom du menu (ex: "Menu Principal", "Menu Footer")
+  slug          String      @unique // Identifiant unique (ex: "main", "footer")
+  location      String?     // Emplacement du menu (ex: "header", "footer", "sidebar")
+  items         MenuItem[]  // Items du menu (relation)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@index([slug])
+}
+
+model MenuItem {
+  id            String      @id @default(cuid())
+  menuId        String      // Référence au menu parent
+  menu          Menu        @relation(fields: [menuId], references: [id], onDelete: Cascade)
+
+  label         String      // Texte affiché (ex: "Accueil", "Produits")
+  url           String?     // URL de destination (ex: "/", "/products")
+  pageId        String?     // Référence à une page si c'est un lien interne
+  type          MenuItemType @default(LINK) // Type d'item
+
+  target        String      @default("_self") // _self, _blank
+  icon          String?     // Icône (optionnel)
+
+  parentId      String?     // Pour les sous-menus
+  parent        MenuItem?   @relation("MenuItemHierarchy", fields: [parentId], references: [id], onDelete: Cascade)
+  children      MenuItem[]  @relation("MenuItemHierarchy")
+
+  order         Int         @default(0) // Ordre d'affichage
+
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@index([menuId])
+  @@index([parentId])
+  @@index([order])
+}
+
+enum MenuItemType {
+  LINK        // Lien simple
+  PAGE        // Lien vers une page
+  CATEGORY    // Lien vers une catégorie/collection
+  CUSTOM      // URL personnalisée
+  DIVIDER     // Séparateur visuel
+}

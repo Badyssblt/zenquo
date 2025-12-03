@@ -196,7 +196,7 @@ export class Kernel {
   /**
    * R�cup�rer une config
    */
-  getConfig(key: string, defaultValue?: any) {
+  getConfig(key: string, defaultValue?: any) {                
     return this.config[key] ?? defaultValue
   }
 
