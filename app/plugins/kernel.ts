@@ -1,5 +1,4 @@
 import { defineNuxtPlugin } from '#app'
-import { useMenu } from '~/composables/useMenu'
 import { Kernel } from '~~/kernel-core'
 
 /**
@@ -11,14 +10,13 @@ export default defineNuxtPlugin(async (nuxtApp) => {
   const kernel = new Kernel()
 
   // ==================== CONFIGURATION INITIALE ====================
-  
+
   // Charger tous les settings depuis la DB (uniquement côté serveur)
   if (import.meta.server) {
     try {
       const { SettingService } = await import('~~/server/services/setting.service')
       const { ThemeService } = await import('~~/server/services/theme.service')
 
-      const { loadMenu } = useMenu()
       // Charger tous les settings via le service
       const settingsMap = await SettingService.getAllAsMap()
       settingsMap.forEach((value, key) => {
@@ -28,11 +26,6 @@ export default defineNuxtPlugin(async (nuxtApp) => {
       // Charger le thème actif via le service
       const activeTheme = await ThemeService.getActive()
 
-      const mainMenu = await loadMenu('menu-principal')
-
-      kernel.setConfig('menu', mainMenu)
-
-      
       if (activeTheme) {
         kernel.setConfig('theme', activeTheme.name)
         kernel.setConfig('themeConfig', activeTheme.config)
