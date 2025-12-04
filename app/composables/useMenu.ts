@@ -24,14 +24,70 @@ export const useMenu = () => {
   }
 
   /**
-   * Charger un menu par son ID
+   * Construire la hiérarchie des items de menu
+   * Transforme une liste plate d'items en structure hiérarchique
+   */
+  const buildHierarchy = (items: MenuItem[]): MenuItem[] => {
+    const itemMap = new Map<string, MenuItem>()
+    const rootItems: MenuItem[] = []
+
+    // Créer une copie des items avec children vide
+    items.forEach(item => {
+      itemMap.set(item.id, { ...item, children: [] })
+    })
+
+    // Construire la hiérarchie
+    items.forEach(item => {
+      const menuItem = itemMap.get(item.id)!
+
+      if (item.parentId) {
+        const parent = itemMap.get(item.parentId)
+        if (parent) {
+          parent.children = parent.children || []
+          parent.children.push(menuItem)
+        } else {
+          // Si le parent n'existe pas, ajouter à la racine
+          rootItems.push(menuItem)
+        }
+      } else {
+        rootItems.push(menuItem)
+      }
+    })
+
+    // Trier par ordre
+    const sortByOrder = (items: MenuItem[]) => {
+      items.sort((a, b) => a.order - b.order)
+      items.forEach(item => {
+        if (item.children && item.children.length > 0) {
+          sortByOrder(item.children)
+        }
+      })
+    }
+
+    sortByOrder(rootItems)
+
+    return rootItems
+  }
+
+  /**
+   * Charger un menu par son ID avec construction de la hiérarchie
    */
   const loadMenu = async (id: string) => {
     try {
       loading.value = true
       error.value = null
-      currentMenu.value = await MenuApiService.getById(id)
-      return currentMenu.value
+
+      const menu = await MenuApiService.getById(id)
+
+      if (menu && menu.items) {
+        // Construire la hiérarchie si les items sont plats
+        if (menu.items.some(item => item.parentId)) {
+          menu.items = buildHierarchy(menu.items)
+        }
+      }
+
+      currentMenu.value = menu
+      return menu
     } catch (e: any) {
       error.value = e.message || 'Erreur lors du chargement du menu'
       console.error('Erreur useMenu.loadMenu:', e)
@@ -42,14 +98,24 @@ export const useMenu = () => {
   }
 
   /**
-   * Charger un menu par son slug
+   * Charger un menu par son slug avec construction de la hiérarchie
    */
   const loadMenuBySlug = async (slug: string) => {
     try {
       loading.value = true
       error.value = null
-      currentMenu.value = await MenuApiService.getBySlug(slug)
-      return currentMenu.value
+
+      const menu = await MenuApiService.getBySlug(slug)
+
+      if (menu && menu.items) {
+        // Construire la hiérarchie si les items sont plats
+        if (menu.items.some(item => item.parentId)) {
+          menu.items = buildHierarchy(menu.items)
+        }
+      }
+
+      currentMenu.value = menu
+      return menu
     } catch (e: any) {
       error.value = e.message || 'Erreur lors du chargement du menu'
       console.error('Erreur useMenu.loadMenuBySlug:', e)
@@ -221,6 +287,52 @@ export const useMenu = () => {
     }
   }
 
+  /**
+   * Réorganiser les items d'un menu (mise à jour de l'ordre)
+   */
+  const reorderItems = async (menuId: string, items: MenuItem[]) => {
+    try {
+      loading.value = true
+      error.value = null
+
+      // Mettre à jour l'ordre de chaque item
+      const updates = items.map((item, index) =>
+        MenuApiService.updateItem(item.id, { order: index })
+      )
+
+      await Promise.all(updates)
+
+      // Recharger le menu
+      await loadMenu(menuId)
+    } catch (e: any) {
+      error.value = e.message || 'Erreur lors de la réorganisation'
+      console.error('Erreur useMenu.reorderItems:', e)
+      throw e
+    } finally {
+      loading.value = false
+    }
+  }
+
+  /**
+   * Aplatir la hiérarchie (inverse de buildHierarchy)
+   * Utile pour obtenir tous les items dans une liste plate
+   */
+  const flattenHierarchy = (items: MenuItem[]): MenuItem[] => {
+    const flattened: MenuItem[] = []
+
+    const flatten = (items: MenuItem[]) => {
+      items.forEach(item => {
+        flattened.push(item)
+        if (item.children && item.children.length > 0) {
+          flatten(item.children)
+        }
+      })
+    }
+
+    flatten(items)
+    return flattened
+  }
+
   return {
     menus,
     currentMenu,
@@ -234,6 +346,9 @@ export const useMenu = () => {
     deleteMenu,
     addMenuItem,
     updateMenuItem,
-    deleteMenuItem
+    deleteMenuItem,
+    reorderItems,
+    buildHierarchy,
+    flattenHierarchy
   }
 }

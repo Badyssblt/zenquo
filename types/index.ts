@@ -12,8 +12,14 @@ export interface Page {
   title: string
   sections: Section[]
   published: boolean
-  createdAt: Date
-  updatedAt: Date
+}
+
+export type MediaType = 'image' | 'video' | 'audio' | 'document'
+
+export interface Media {
+  name: string
+  type: MediaType
+  url: string
 }
 
 export type SettingType =

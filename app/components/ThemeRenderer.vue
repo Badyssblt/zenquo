@@ -41,13 +41,12 @@ onMounted(async () => {
 
 <template>
   <div class="theme-renderer">
-    <!-- Rendre chaque section dynamiquement -->
+    <!-- Rendre chaque section dynamiquement avec v-model -->
     <component
-    
       v-for="(section, index) in sections"
       :key="section.id || `section-${index}`"
       :is="sectionComponents[section.type]"
-      v-bind="section.settings"
+      v-model:settings="section.settings"
       :data-section-id="section.id"
       :data-section-type="section.type"
     />

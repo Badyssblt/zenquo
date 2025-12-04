@@ -16,6 +16,8 @@ export default defineNuxtPlugin(async (nuxtApp) => {
     try {
       const { SettingService } = await import('~~/server/services/setting.service')
       const { ThemeService } = await import('~~/server/services/theme.service')
+      const { MenuService } = await import('~~/server/services/menu.service')
+      const { MediaService } = await import('~~/server/services/media.service')
 
       // Charger tous les settings via le service
       const settingsMap = await SettingService.getAllAsMap()
@@ -23,19 +25,43 @@ export default defineNuxtPlugin(async (nuxtApp) => {
         kernel.setConfig(`settings.${key}`, value)
       })
 
+      const medias = await MediaService.getAllMedia()
+
+      kernel.setConfig('medias', medias)
+      
+
+      // Charger les menus principaux (header, footer, etc.)
+      try {
+        // Charger le menu header
+        const headerMenu = await MenuService.getBySlug('header')
+        if (headerMenu) {
+          kernel.setConfig('menus.header', headerMenu)
+        }
+
+        // Charger le menu footer
+        const footerMenu = await MenuService.getBySlug('footer')
+        if (footerMenu) {
+          kernel.setConfig('menus.footer', footerMenu)
+        }
+      } catch (menuError) {
+        if (process.env.NODE_ENV === 'development') {
+          console.warn('⚠️  Erreur lors du chargement des menus:', menuError)
+        }
+      }
+
+
       // Charger le thème actif via le service
       const activeTheme = await ThemeService.getActive()
 
       if (activeTheme) {
         kernel.setConfig('theme', activeTheme.name)
         kernel.setConfig('themeConfig', activeTheme.config)
-        console.log(`✅ Thème actif: ${activeTheme.name}`)
       } else {
         kernel.setConfig('theme', 'default')
-        console.warn('⚠️  Aucun thème actif en DB, utilisation du thème default')
+        if (process.env.NODE_ENV === 'development') {
+          console.warn('⚠️  Aucun thème actif en DB, utilisation du thème default')
+        }
       }
-
-      console.log(`✅ ${settingsMap.size} settings chargés depuis la DB`)
 
       // IMPORTANT: Passer la config au client via le payload Nuxt
       nuxtApp.payload.kernelConfig = kernel.getAllConfig()
@@ -44,6 +70,8 @@ export default defineNuxtPlugin(async (nuxtApp) => {
       // Fallback values
       kernel.setConfig('theme', 'default')
       kernel.setConfig('settings.siteName', 'Zenquo')
+      kernel.setConfig('menus.header', null)
+      kernel.setConfig('menus.footer', null)
       nuxtApp.payload.kernelConfig = kernel.getAllConfig()
     }
   } else {
@@ -54,8 +82,6 @@ export default defineNuxtPlugin(async (nuxtApp) => {
     Object.entries(kernelConfig).forEach(([key, value]) => {
       kernel.setConfig(key, value)
     })
-
-    console.log('✅ Config kernel restaurée depuis le payload SSR')
   }
 
 
@@ -63,24 +89,6 @@ export default defineNuxtPlugin(async (nuxtApp) => {
 
   // Les plugins seront chargés ici
   // Exemple : kernel.registerPlugin('wishlist', wishlistPlugin)
-
-  // ==================== HOOKS DE DEBUG (en développement) ====================
-
-  if (process.env.NODE_ENV === 'development') {
-    // Logger toutes les actions déclenchées
-    kernel.addAction('*', (...args: any[]) => {
-      console.log('[Kernel Debug] Action triggered:', args)
-    }, 999)
-  }
-
-  // ==================== EXPOSER LE KERNEL ====================
-
-  // Logger selon l'environnement
-  if (import.meta.server) {
-    console.log('✅ Kernel initialized on server')
-  } else {
-    console.log('✅ Kernel initialized on client')
-  }
 
   // Retourner le kernel pour qu'il soit disponible via $kernel
   return {

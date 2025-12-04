@@ -6,7 +6,11 @@ export const settingsDefinition: Record<string, SettingDefinition> = {
   title: {
     type: 'string',
     default: 'Bienvenue sur Zenquo!',
-    label: 'Titre principal'
+    label: 'Titre principal',
+    properties: {
+      type: 'alignment',
+      default: 'center'
+    }
   },
   subtitle: {
     type: 'text',
@@ -77,7 +81,10 @@ const settings = defineModel<HeroSettings>('settings', {
 // Computed pour accès facile aux propriétés
 const title = computed(() => settings.value.title || 'Bienvenue sur Zenquo!')
 const subtitle = computed(() => settings.value.subtitle || 'Créez votre boutique en ligne facilement')
-const backgroundImage = computed(() => settings.value.backgroundImage || '')
+const backgroundImage = computed(() => {
+  const img = settings.value.backgroundImage || ''
+  return img
+})
 const ctaButton = computed(() => settings.value.ctaButton)
 
 const { $kernel } = useNuxtApp()
@@ -89,11 +96,13 @@ onMounted(async () => {
     settings: settings.value
   })
 })
+
+
 </script>
 
 <template>
   <section
-    class="hero relative min-h-[600px] flex items-center justify-center text-white"
+    class="hero relative min-h-[600px] bg-blue-600 flex items-center justify-center text-white"
     :style="{
       backgroundImage: backgroundImage ? `url(${backgroundImage})` : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
       backgroundSize: 'cover',
@@ -118,7 +127,7 @@ onMounted(async () => {
         <NuxtLink
           :to="ctaButton.link"
           class="inline-flex items-center px-6 py-3 rounded-lg font-semibold transition-colors"
-          :class="ctaButton.variant === 'primary' ? 'bg-white text-purple-600 hover:bg-gray-100' : 'bg-purple-500 text-white hover:bg-purple-600'"
+          :class="ctaButton.variant === 'primary' ? 'bg-white text-blue-600 hover:bg-gray-100' : 'bg-blue-500 text-white hover:bg-blue-600'"
         >
           {{ ctaButton.text }}
         </NuxtLink>

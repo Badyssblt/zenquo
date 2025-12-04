@@ -4,6 +4,7 @@ import { ThemeService } from '../server/services/theme.service'
 import { UserService } from '../server/services/user.service'
 import { PageService } from '../server/services/page.service'
 import { SettingService } from '../server/services/setting.service'
+import { MenuService } from '../server/services/menu.service'
 
 
 /**
@@ -131,6 +132,116 @@ async function main() {
 
   await SettingService.createMany(defaultSettings)
   console.log(`  ✓ ${defaultSettings.length} settings créés/mis à jour`)
+
+  // ==================== MENUS ====================
+  console.log('\n🗂️  Création des menus par défaut...')
+
+  // Menu Header
+  const headerMenuSlug = 'header'
+  const headerMenuExists = await MenuService.getBySlug(headerMenuSlug)
+
+  if (!headerMenuExists) {
+    const headerMenu = await MenuService.create({
+      name: 'Menu Principal',
+      slug: headerMenuSlug,
+      location: 'header'
+    })
+
+    // Ajouter les items au menu header
+    await MenuService.addItem(headerMenu.id, {
+      label: 'Accueil',
+      url: '/',
+      type: 'LINK',
+      order: 0
+    })
+
+    await MenuService.addItem(headerMenu.id, {
+      label: 'Produits',
+      url: '/products',
+      type: 'LINK',
+      order: 1
+    })
+
+    const shopParent = await MenuService.addItem(headerMenu.id, {
+      label: 'Boutique',
+      url: '#',
+      type: 'CUSTOM',
+      order: 2
+    })
+
+    // Sous-items de "Boutique"
+    await MenuService.addItem(headerMenu.id, {
+      label: 'Nouveautés',
+      url: '/products/new',
+      type: 'LINK',
+      parentId: shopParent.id,
+      order: 0
+    })
+
+    await MenuService.addItem(headerMenu.id, {
+      label: 'Promotions',
+      url: '/products/sales',
+      type: 'LINK',
+      parentId: shopParent.id,
+      order: 1
+    })
+
+    await MenuService.addItem(headerMenu.id, {
+      label: 'À propos',
+      url: '/about',
+      type: 'LINK',
+      order: 3
+    })
+
+    await MenuService.addItem(headerMenu.id, {
+      label: 'Contact',
+      url: '/contact',
+      type: 'LINK',
+      order: 4
+    })
+
+    console.log(`  ✓ Menu créé: ${headerMenuSlug}`)
+  } else {
+    console.log(`  ↻ Menu existe déjà: ${headerMenuSlug}`)
+  }
+
+  // Menu Footer
+  const footerMenuSlug = 'footer'
+  const footerMenuExists = await MenuService.getBySlug(footerMenuSlug)
+
+  if (!footerMenuExists) {
+    const footerMenu = await MenuService.create({
+      name: 'Menu Footer',
+      slug: footerMenuSlug,
+      location: 'footer'
+    })
+
+    // Ajouter les items au menu footer
+    await MenuService.addItem(footerMenu.id, {
+      label: 'Mentions légales',
+      url: '/legal',
+      type: 'LINK',
+      order: 0
+    })
+
+    await MenuService.addItem(footerMenu.id, {
+      label: 'CGV',
+      url: '/terms',
+      type: 'LINK',
+      order: 1
+    })
+
+    await MenuService.addItem(footerMenu.id, {
+      label: 'Politique de confidentialité',
+      url: '/privacy',
+      type: 'LINK',
+      order: 2
+    })
+
+    console.log(`  ✓ Menu créé: ${footerMenuSlug}`)
+  } else {
+    console.log(`  ↻ Menu existe déjà: ${footerMenuSlug}`)
+  }
 
   console.log('\n✅ Seed terminé !')
 }

@@ -1,0 +1,4 @@
+# Keep uploads in git
+*
+!.gitkeep
+!.gitignore
