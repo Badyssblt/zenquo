@@ -1131,6 +1131,7 @@ export const PageScalarFieldEnum = {
   title: 'title',
   sections: 'sections',
   published: 'published',
+  isHome: 'isHome',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const

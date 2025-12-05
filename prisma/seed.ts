@@ -97,13 +97,32 @@ async function main() {
       slug: homeSlug,
       title: 'Accueil',
       published: true,
+      isHome: true,
       sections: [
         {
           id: 'hero-1',
           type: 'Hero',
           settings: {
-            title: 'Bienvenue sur Zenquo',
-            subtitle: 'Le CMS e-commerce modulaire et extensible',
+            title: {
+              content: 'Bienvenue sur Zenquo',
+              align: 'center',
+              size: '5xl',
+              weight: 'bold',
+              color: '#ffffff',
+              tag: 'h1',
+              italic: false,
+              lineHeight: 'normal'
+            },
+            subtitle: {
+              content: 'Le CMS e-commerce modulaire et extensible',
+              align: 'center',
+              size: 'xl',
+              weight: 'normal',
+              color: '#ffffff',
+              tag: 'p',
+              italic: false,
+              lineHeight: 'normal'
+            },
             backgroundImage: '',
             ctaButton: {
               text: 'Découvrir',

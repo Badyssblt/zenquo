@@ -44,6 +44,15 @@
             Publier la page
           </Label>
         </div>
+        <div class="flex items-center space-x-2">
+          <Checkbox
+            id="page-is-home"
+            v-model:checked="page.isHome"
+          />
+          <Label for="page-is-home" class="cursor-pointer">
+            Page d'accueil
+          </Label>
+        </div>
       </div>
 
       <!-- Section settings -->

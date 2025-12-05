@@ -42,13 +42,20 @@ export class PageService {
     title: string
     sections?: Section[]
     published?: boolean
+    isHome?: boolean
   }) {
+    // Si la page devient la page d'accueil, retirer isHome des autres pages
+    if (data.isHome === true) {
+      await this.unsetAllHomePage()
+    }
+
     return await prisma.page.create({
       data: {
         slug: data.slug,
         title: data.title,
         sections: data.sections || [],
-        published: data.published || false
+        published: data.published || false,
+        isHome: data.isHome || false
       }
     })
   }
@@ -128,6 +135,25 @@ export class PageService {
       title: newTitle,
       sections: page.sections as Section[],
       published: false
+    })
+  }
+
+  /**
+   * Retirer le flag isHome de toutes les pages
+   */
+  static async unsetAllHomePage() {
+    return await prisma.page.updateMany({
+      where: { isHome: true },
+      data: { isHome: false }
+    })
+  }
+
+  /**
+   * Récupérer la page d'accueil
+   */
+  static async getHomePage() {
+    return await prisma.page.findFirst({
+      where: { isHome: true, published: true }
     })
   }
 }

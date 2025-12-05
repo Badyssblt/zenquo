@@ -36,6 +36,7 @@ model Page {
   title         String
   sections      Json      // Array de sections avec settings
   published     Boolean   @default(false)
+  isHome        Boolean   @default(false)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 }

@@ -12,14 +12,15 @@ export interface Page {
   title: string
   sections: Section[]
   published: boolean
+  isHome: boolean
 }
 
-export type MediaType = 'image' | 'video' | 'audio' | 'document'
-
 export interface Media {
-  name: string
-  type: MediaType
+  filename: string
   url: string
+  size: number
+  type: string
+  createdAt: Date | string
 }
 
 export type SettingType =
@@ -31,7 +32,7 @@ export type SettingType =
   | 'color'       // Color picker
   | 'image'       // Upload image
   | 'icon'        // Sélecteur d'icône
-  | 'component'   // Composant nested éditable
+  | 'object'      // Objet avec properties
   | 'array'       // Liste d'items répétables
 
 export interface SettingDefinition {
@@ -39,7 +40,9 @@ export interface SettingDefinition {
   default: any
   label: string
   options?: string[]
-  component?: string
+  properties?: Record<string, SettingDefinition>  // Pour les objets nested
+  itemType?: 'string' | 'number' | 'object'      // Type des items dans un array
+  itemProperties?: Record<string, SettingDefinition>  // Properties des objets dans un array
 }
 
 export interface SectionComponent {

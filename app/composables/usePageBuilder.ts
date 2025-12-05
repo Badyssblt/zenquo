@@ -10,7 +10,8 @@ export const usePageBuilder = () => {
     slug: '',
     title: '',
     sections: [],
-    published: false
+    published: false,
+    isHome: false
   }))
 
   // États UI
@@ -22,6 +23,7 @@ export const usePageBuilder = () => {
   // Sections disponibles
   const availableSections = [
     { name: 'Hero', description: 'Section d\'en-tête avec titre et CTA' },
+    { name: 'Carousel', description: 'Carrousel de slides avec images' },
     { name: 'Features', description: 'Grille de fonctionnalités' },
     { name: 'CTA', description: 'Appel à l\'action' },
     { name: 'Testimonials', description: 'Témoignages clients' },
@@ -55,7 +57,8 @@ export const usePageBuilder = () => {
           title: page.value.title,
           slug: page.value.slug,
           sections: page.value.sections,
-          published: page.value.published
+          published: page.value.published,
+          isHome: page.value.isHome
         }
       })
 

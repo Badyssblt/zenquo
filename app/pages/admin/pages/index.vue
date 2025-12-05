@@ -36,9 +36,14 @@
               <code class="px-2 py-1 bg-muted rounded text-sm">{{ page.slug }}</code>
             </TableCell>
             <TableCell>
-              <Badge :variant="page.published ? 'default' : 'secondary'">
-                {{ page.published ? 'Publié' : 'Brouillon' }}
-              </Badge>
+              <div class="flex gap-2">
+                <Badge :variant="page.published ? 'default' : 'secondary'">
+                  {{ page.published ? 'Publié' : 'Brouillon' }}
+                </Badge>
+                <Badge v-if="page.isHome" variant="outline" class="bg-blue-50 text-blue-700 border-blue-200">
+                  Accueil
+                </Badge>
+              </div>
             </TableCell>
             <TableCell>
               <span class="text-sm text-muted-foreground">

@@ -13,30 +13,20 @@ export const useTheme = () => {
     const theme = activeTheme.value
 
     return defineAsyncComponent(async () => {
-      // Charger tous les modules de sections disponibles
-      const allSections = import.meta.glob<any>('~/themes/*/sections/*.vue', { eager: false })
-
-      // Construire le chemin relatif pour le thème actif
-      const themePath = `~/themes/${theme}/sections/${sectionName}.vue`
-      const defaultPath = `~/themes/default/sections/${sectionName}.vue`
-
-      // Chercher le module correspondant
-      for (const [path, loader] of Object.entries(allSections)) {
-        // Normaliser les chemins pour la comparaison
-        if (path.includes(`/themes/${theme}/sections/${sectionName}.vue`)) {
-          return await loader()
+      try {
+        // Essayer de charger depuis le thème actif
+        const themeModule = await import(`~/themes/${theme}/sections/${sectionName}.vue`)
+        return themeModule.default || themeModule
+      } catch (error) {
+        // Fallback vers le thème default
+        console.warn(`Section ${sectionName} not found in theme ${theme}, trying default`)
+        try {
+          const defaultModule = await import(`~/themes/default/sections/${sectionName}.vue`)
+          return defaultModule.default || defaultModule
+        } catch (defaultError) {
+          throw new Error(`Section ${sectionName} not found in any theme`)
         }
       }
-
-      // Fallback vers le thème default
-      console.warn(`Section ${sectionName} not found in theme ${theme}, trying default`)
-      for (const [path, loader] of Object.entries(allSections)) {
-        if (path.includes(`/themes/default/sections/${sectionName}.vue`)) {
-          return await loader()
-        }
-      }
-
-      throw new Error(`Section ${sectionName} not found in any theme`)
     })
   }
 
@@ -47,25 +37,20 @@ export const useTheme = () => {
     const theme = activeTheme.value
 
     return defineAsyncComponent(async () => {
-      // Charger tous les modules de composants disponibles
-      const allComponents = import.meta.glob<any>('~/themes/*/components/*.vue', { eager: false })
-
-      // Chercher le module correspondant pour le thème actif
-      for (const [path, loader] of Object.entries(allComponents)) {
-        if (path.includes(`/themes/${theme}/components/${componentName}.vue`)) {
-          return await loader()
+      try {
+        // Essayer de charger depuis le thème actif
+        const themeModule = await import(`~/themes/${theme}/components/${componentName}.vue`)
+        return themeModule.default || themeModule
+      } catch (error) {
+        // Fallback vers le thème default
+        console.warn(`Component ${componentName} not found in theme ${theme}, trying default`)
+        try {
+          const defaultModule = await import(`~/themes/default/components/${componentName}.vue`)
+          return defaultModule.default || defaultModule
+        } catch (defaultError) {
+          throw new Error(`Component ${componentName} not found in any theme`)
         }
       }
-
-      // Fallback vers le thème default
-      console.warn(`Component ${componentName} not found in theme ${theme}, trying default`)
-      for (const [path, loader] of Object.entries(allComponents)) {
-        if (path.includes(`/themes/default/components/${componentName}.vue`)) {
-          return await loader()
-        }
-      }
-
-      throw new Error(`Component ${componentName} not found in any theme`)
     })
   }
 

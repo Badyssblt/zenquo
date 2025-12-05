@@ -33,12 +33,18 @@ export default defineEventHandler(async (event) => {
       }
     }
 
+    // Si la page devient la page d'accueil, retirer isHome des autres pages
+    if (body.isHome === true) {
+      await PageService.unsetAllHomePage()
+    }
+
     // Mettre à jour la page
     const updatedPage = await PageService.update(existingPage.id, {
       slug: body.slug,
       title: body.title,
       sections: body.sections,
-      published: body.published
+      published: body.published,
+      isHome: body.isHome
     })
 
     return updatedPage

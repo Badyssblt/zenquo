@@ -29,6 +29,7 @@ export type PageMinAggregateOutputType = {
   slug: string | null
   title: string | null
   published: boolean | null
+  isHome: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -38,6 +39,7 @@ export type PageMaxAggregateOutputType = {
   slug: string | null
   title: string | null
   published: boolean | null
+  isHome: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -48,6 +50,7 @@ export type PageCountAggregateOutputType = {
   title: number
   sections: number
   published: number
+  isHome: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -59,6 +62,7 @@ export type PageMinAggregateInputType = {
   slug?: true
   title?: true
   published?: true
+  isHome?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -68,6 +72,7 @@ export type PageMaxAggregateInputType = {
   slug?: true
   title?: true
   published?: true
+  isHome?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -78,6 +83,7 @@ export type PageCountAggregateInputType = {
   title?: true
   sections?: true
   published?: true
+  isHome?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -161,6 +167,7 @@ export type PageGroupByOutputType = {
   title: string
   sections: runtime.JsonValue
   published: boolean
+  isHome: boolean
   createdAt: Date
   updatedAt: Date
   _count: PageCountAggregateOutputType | null
@@ -192,6 +199,7 @@ export type PageWhereInput = {
   title?: Prisma.StringFilter<"Page"> | string
   sections?: Prisma.JsonFilter<"Page">
   published?: Prisma.BoolFilter<"Page"> | boolean
+  isHome?: Prisma.BoolFilter<"Page"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Page"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Page"> | Date | string
 }
@@ -202,6 +210,7 @@ export type PageOrderByWithRelationInput = {
   title?: Prisma.SortOrder
   sections?: Prisma.SortOrder
   published?: Prisma.SortOrder
+  isHome?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _relevance?: Prisma.PageOrderByRelevanceInput
@@ -216,6 +225,7 @@ export type PageWhereUniqueInput = Prisma.AtLeast<{
   title?: Prisma.StringFilter<"Page"> | string
   sections?: Prisma.JsonFilter<"Page">
   published?: Prisma.BoolFilter<"Page"> | boolean
+  isHome?: Prisma.BoolFilter<"Page"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Page"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Page"> | Date | string
 }, "id" | "slug">
@@ -226,6 +236,7 @@ export type PageOrderByWithAggregationInput = {
   title?: Prisma.SortOrder
   sections?: Prisma.SortOrder
   published?: Prisma.SortOrder
+  isHome?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.PageCountOrderByAggregateInput
@@ -242,6 +253,7 @@ export type PageScalarWhereWithAggregatesInput = {
   title?: Prisma.StringWithAggregatesFilter<"Page"> | string
   sections?: Prisma.JsonWithAggregatesFilter<"Page">
   published?: Prisma.BoolWithAggregatesFilter<"Page"> | boolean
+  isHome?: Prisma.BoolWithAggregatesFilter<"Page"> | boolean
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Page"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Page"> | Date | string
 }
@@ -252,6 +264,7 @@ export type PageCreateInput = {
   title: string
   sections: Prisma.JsonNullValueInput | runtime.InputJsonValue
   published?: boolean
+  isHome?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -262,6 +275,7 @@ export type PageUncheckedCreateInput = {
   title: string
   sections: Prisma.JsonNullValueInput | runtime.InputJsonValue
   published?: boolean
+  isHome?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -272,6 +286,7 @@ export type PageUpdateInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   sections?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   published?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isHome?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -282,6 +297,7 @@ export type PageUncheckedUpdateInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   sections?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   published?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isHome?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -292,6 +308,7 @@ export type PageCreateManyInput = {
   title: string
   sections: Prisma.JsonNullValueInput | runtime.InputJsonValue
   published?: boolean
+  isHome?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -302,6 +319,7 @@ export type PageUpdateManyMutationInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   sections?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   published?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isHome?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -312,6 +330,7 @@ export type PageUncheckedUpdateManyInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   sections?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   published?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isHome?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -328,6 +347,7 @@ export type PageCountOrderByAggregateInput = {
   title?: Prisma.SortOrder
   sections?: Prisma.SortOrder
   published?: Prisma.SortOrder
+  isHome?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -337,6 +357,7 @@ export type PageMaxOrderByAggregateInput = {
   slug?: Prisma.SortOrder
   title?: Prisma.SortOrder
   published?: Prisma.SortOrder
+  isHome?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -346,6 +367,7 @@ export type PageMinOrderByAggregateInput = {
   slug?: Prisma.SortOrder
   title?: Prisma.SortOrder
   published?: Prisma.SortOrder
+  isHome?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -362,6 +384,7 @@ export type PageSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   title?: boolean
   sections?: boolean
   published?: boolean
+  isHome?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["page"]>
@@ -374,11 +397,12 @@ export type PageSelectScalar = {
   title?: boolean
   sections?: boolean
   published?: boolean
+  isHome?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type PageOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "slug" | "title" | "sections" | "published" | "createdAt" | "updatedAt", ExtArgs["result"]["page"]>
+export type PageOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "slug" | "title" | "sections" | "published" | "isHome" | "createdAt" | "updatedAt", ExtArgs["result"]["page"]>
 
 export type $PagePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Page"
@@ -389,6 +413,7 @@ export type $PagePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     title: string
     sections: runtime.JsonValue
     published: boolean
+    isHome: boolean
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["page"]>
@@ -765,6 +790,7 @@ export interface PageFieldRefs {
   readonly title: Prisma.FieldRef<"Page", 'String'>
   readonly sections: Prisma.FieldRef<"Page", 'Json'>
   readonly published: Prisma.FieldRef<"Page", 'Boolean'>
+  readonly isHome: Prisma.FieldRef<"Page", 'Boolean'>
   readonly createdAt: Prisma.FieldRef<"Page", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Page", 'DateTime'>
 }
